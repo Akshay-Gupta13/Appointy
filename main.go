@@ -4,8 +4,8 @@ import(
 	"time"
 	"net/http"
 	"fmt"
-	"net/httptest"
-	
+	// "net/httptest"
+
 )
 
 // entities
@@ -65,6 +65,13 @@ type ListAppointmentRequest struct {
 
 
 // helper functions
+type Slot struct {
+	ResourceId string `json:"resourceId"`
+	StartTime  string `json:"startTime"`
+	EndTime    string `json:"endTime"`
+	Quantity   int64  `json:"quantity"`
+	
+}
 
 func TimeToString(tm time.Time) string {
 	return tm.Format(time.RFC3339)
@@ -79,9 +86,9 @@ func StringToTime(timeStr string) (time.Time, error) {
 	return s, nil
 }
 func (s *Server) routes(){
-	s.HandleFunc("/available-slots", s.listnewUserSlot()),Method("GET")
-	s.HandleFunc("/available-slots", s.createnewUserSlot()),Method("POST")
-	s.HandleFunc("/available-slots/{id}", s.removenewUserSlot()),Method("DELETE")
+	s:HandleFunc("/available-slots", s.listnewUserSlot()),Method("GET")
+	s:HandleFunc("/available-slots", s.createnewUserSlot()),Method("POST")
+	s:HandleFunc("/available-slots/{id}", s.removenewUserSlot()),Method("DELETE")
    
    }
    
