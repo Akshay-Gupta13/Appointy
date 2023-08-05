@@ -70,7 +70,7 @@ type Slot struct {
 	StartTime  string `json:"startTime"`
 	EndTime    string `json:"endTime"`
 	Quantity   int64  `json:"quantity"`
-	
+
 }
 
 func TimeToString(tm time.Time) string {
@@ -109,3 +109,4 @@ func (s *Server) newUserSlot() http.HandleFunc {
 		   }
 	   }
    }
+   the core logic i am implementing was first to check and fetch details hierarchy as first import data from first five given API's then at last using the Availability API to assign/notassign slots which depends on factor: the time duration of previous slots, the quantity of previous slots beacuse if the remaining slots (total - slots occupied by previous slot) and the new slot quantity is less than or equal to left over slot space then we can assign slot parallel to previous slot other wise we have to wait till it end and another condition of block hours also to be considered as if we assign slot but it overlaps with beginning time of block hours then we cant assign that window and base case for each case before assigning is it lies in time range of after 9:00 to before 5:00 if ending time of any slot is beyond 5:00 then we cant assign slots.
