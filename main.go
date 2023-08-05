@@ -1,50 +1,30 @@
 package main
 
-import (
-	// "fmt"
-	// "log"
-	// "os"
-	// "testing"
-	// "log"
-	// "net/http"
-	// "net/http/httptest"
-	// "strconv"
-	// "bytes"
-)
+import "time"
 
-type ResourceId struct {	
-  Id   string `json:"id"`
-  Name string `json:"name"`
-  Type string `json:"type"`
-//   key value pair, upper case -> datatype then json format
+// entities
+
+type Resource struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
-type Date struct {
-	Date int64 `json:"date"`
-// date cant be string but integer type.
-}
-// during business hours the occuiped slot with some q1 quantity and remain with less than total-q1 space for people.
-type TotalSlots struct {
-  Id        string `json:"id"`
-  StartTime string `json:"start_time"`
-  EndTime   string `json:"end_time"`
-
-
-}
-type UnavailableSlot struct{
-// related to minutes or seconds , slots which are not available for given quantitites.
-	Id           string `json:"id"`
-	ResourceId   string `json:"resource"`
-	StartTime    string `json:"starttime"`
-	EndTime      string `json:"endtime"`
+type BusinessHour struct {
+	Id         string    `json:"id"`
+	ResourceId string    `json:"resource_id"`
+	Quantity   int64     `json:"quantity"`
+	StartTime  string    `json:"start_time"`
+	EndTime    string    `json:"end_time"`
 }
 
-
-type Quantity struct {
-     Id               string `json:"id"`
-	 ResourceId       string `json:"resource"` 	  
-	 UnavailableSlot  string `json:"unavailableslot"`
+type BlockHour struct {
+	Id         string    `json:"id"`
+	ResourceId string    `json:"resource_id"`
+	StartTime  string    `json:"start_time"`
+	EndTime    string    `json:"end_time"`
 }
+
 type Appointment struct {
 	Id         string    `json:"id"`
 	ResourceId string    `json:"resource_id"`
@@ -53,20 +33,65 @@ type Appointment struct {
 	EndTime    string    `json:"end_time"`
 }
 
-type BlockHours struct {
-	Id         string `json:"id"`
-	ResourceId string `json:"resource_id"`
-	StartTime  string `json:"starttime"`
-	EndTime    string `json:"endtime"`
-// maintainance time or server reset time
+type Duration struct {
+	Seconds int64 `json:"seconds"`
 }
-// string to time conversion needed ?..
-// slot avalibilty depends on : occupied users 
-// : space required for new user (total-occupied)>= newusers
-//    start and end duration (overlap with other might be possible)
-// output part..
-  
- func main() {
- 
 
- }
+// endpoint request structs
+
+type ListBusinessHoursRequest struct {
+	ResourceId string `json:"resourceId"`
+	StartTime  string `json:"startTime"`
+	EndTime    string `json:"endTime"`
+}
+
+type ListBlockHoursRequest struct {
+	ResourceId string `json:"resourceId"`
+	StartTime  string `json:"startTime"`
+	EndTime    string `json:"endTime"`
+}
+
+type ListAppointmentRequest struct {
+	ResourceId string `json:"resourceId"`
+	StartTime  string `json:"startTime"`
+	EndTime    string `json:"endTime"`
+}
+
+// helper functions
+
+func TimeToString(tm time.Time) string {
+	return tm.Format(time.RFC3339)
+}
+
+func StringToTime(timeStr string) (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, timeStr)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return t, nil
+}
+func (s *Server) routes(){
+	s.HandleFunc("/available-slots", s.listnewUserSlot()),Method("GET")
+	s.HandleFunc("/available-slots", s.createnewUserSlot()),Method("POST")
+	s.HandleFunc("/available-slots/{id}", s.removenewUserSlot()),Method("DELETE")
+   
+   }
+   
+func (s *Server) newUserSlot() http.HandleFunc {
+	   return func(w http.ResponseWriter, r *http.Request){
+		   var i Slot 
+		   if err := json.NewDecoder(r.Body).Decode(&i); err != nil {
+			   http.Error(w, err.Error(), http.StatusBadRequest)
+			   return
+		   }
+		   i.ID = uuid.New()
+		   s.newUserSlot = append(s.newUserSlot, i)
+   
+		   w.Header().Set("Content-Type", "application/json")
+		   if err := json.NewEncoder(w).Encode(i); err != nil {
+		   http.Error(w, err.Error(), http.StatusInternalServerError)
+		   return 
+		   }
+	   }
+   }
