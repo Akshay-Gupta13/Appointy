@@ -1,6 +1,12 @@
 package main
 
-import "time"
+import(
+	"time"
+	"net/http"
+	"fmt"
+	"net/httptest"
+	
+)
 
 // entities
 
@@ -57,6 +63,7 @@ type ListAppointmentRequest struct {
 	EndTime    string `json:"endTime"`
 }
 
+
 // helper functions
 
 func TimeToString(tm time.Time) string {
@@ -64,12 +71,12 @@ func TimeToString(tm time.Time) string {
 }
 
 func StringToTime(timeStr string) (time.Time, error) {
-	t, err := time.Parse(time.RFC3339, timeStr)
+	s, err := time.Parse(time.RFC3339, timeStr)
 	if err != nil {
 		return time.Time{}, err
 	}
 
-	return t, nil
+	return s, nil
 }
 func (s *Server) routes(){
 	s.HandleFunc("/available-slots", s.listnewUserSlot()),Method("GET")
