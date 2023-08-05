@@ -1,0 +1,252 @@
+openapi: "3.0.0"
+info:
+  title: "Cricket Pitch Booking System"
+  version: "1.0.0"
+  description: "API for managing cricket pitch bookings."
+
+servers:
+  - url: "https://api.internship.appointy.com/v1"
+
+paths:
+  /resources/:
+    get:
+      summary: "List of Resources"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Resource"
+
+  /business-hours/:
+    get:
+      summary: "Get Business Hours between a time range for a resource"
+      parameters:
+        - name: "resourceId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "startTime"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "endTime"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/BusinessHour"
+
+  /block-hours/:
+    get:
+      summary: "Get Block Hours between a time range for a resource"
+      parameters:
+        - name: "resourceId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "startTime"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "endTime"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/BlockHour"
+
+  /appointments/:
+    get:
+      summary: "Get Appointments between a time range for a resource"
+      parameters:
+        - name: "resourceId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "startTime"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "endTime"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Appointment"
+
+  /durations/:
+    get:
+      summary: "Get Allowed Durations"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Duration"
+
+  /availability/:
+    get:
+      summary: "Get Available Slots"
+      parameters:
+        - name: "resourceId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "date"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "duration"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+        - name: "quantity"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Availability"
+
+components:
+  schemas:
+    Duration:
+      type: "object"
+      properties:
+        seconds:
+          type: "integer"
+          description: "Duration in seconds."
+
+    Resource:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "Unique identifier for the resource."
+        name:
+          type: "string"
+          description: "Name of the resource (e.g., Pitch 1)."
+        description:
+          type: "string"
+          description: "Detailed description of the resource."
+
+    BusinessHour:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        resourceId:
+          type: "string"
+          description: "Associated resource ID."
+        quantity:
+          type: "integer"
+          description: "Available quantity of the resource."
+        start_time:
+          type: "string"
+          format: "date-time"
+          description: "Start time for business hours."
+        end_time:
+          type: "string"
+          format: "date-time"
+          description: "End time for business hours."
+
+    BlockHour:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        resourceId:
+          type: "string"
+          description: "Associated resource ID."
+        start_time:
+          type: "string"
+          format: "date-time"
+          description: "Start time for block hours."
+        end_time:
+          type: "string"
+          format: "date-time"
+          description: "End time for block hours."
+
+    Appointment:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        resourceId:
+          type: "string"
+          description: "Associated resource ID."
+        quantity:
+          type: "integer"
+          description: "Quantity booked for the appointment."
+        start_time:
+          type: "string"
+          format: "date-time"
+          description: "Start time of the appointment."
+        end_time:
+          type: "string"
+          format: "date-time"
+          description: "End time of the appointment."
+
+    Availability:
+      type: "object"
+      properties:
+        available_slots:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              start_time:
+                type: "string"
+                format: "date-time"
+              end_time:
+                type: "string"
+                format: "date-time"
+          description: "List of available slots for booking."
+        time_taken:
+          type: "string"
+          description: "Time taken to find the available slots."
